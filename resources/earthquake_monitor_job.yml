@@ -1,0 +1,22 @@
+# A job running SQL queries on a SQL warehouse
+resources:
+  jobs:
+    dbsql_earthquake_monitor:
+      name: dbsql_earthquake_monitor
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: HOURS
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: earthquake_monitor
+          notebook_task:
+            notebook_path: ../src/earthquake_monitor.sql
+            warehouse_id: ${var.warehouse_id}
