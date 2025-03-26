@@ -1,4 +1,12 @@
 -- Databricks notebook source
+-- MAGIC %md
+-- MAGIC ## SQL Scripting Version
+-- MAGIC Adds HTTP response checking with [SQL scripting](https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-scripting), which is available in DBSQL 2025.15 and DBR 16.3.
+-- MAGIC
+-- MAGIC Non-200 responses are logged to a Delta table for review and alerting.
+
+-- COMMAND ----------
+
 -- DBTITLE 1,Define HTTP Connection
 /*
 Set up a connection to USGS earthquakes feed. This is generally going
@@ -26,12 +34,12 @@ use schema identifier(:schema);
 -- COMMAND ----------
 
 -- DBTITLE 1,Create Error Log Table
-create table if not exists earthquakes_error_log (
+create table if not exists earthquakes_log (
   timestamp timestamp,
   job_id string,
   job_run_id string,
   status_code int,
-  error_message string
+  text string
 );
 
 -- COMMAND ----------
@@ -54,10 +62,7 @@ set var resp = (
 -- Log non-200 responses to Delta table
 -- Script must be in separate notebook cell
 begin
-  if resp.status_code != 200 then
-    insert into IDENTIFIER(:catalog || '.' || :schema || '.' || 'earthquakes_error_log') (timestamp, job_id, job_run_id, status_code, error_message)
-      values (current_timestamp(), :job_id, :job_run_id, resp.status_code, resp.text);
-  else
+  if resp.status_code == 200 then
     create or replace table earthquakes as
     with raw_data as (
       select explode(variant_get(parse_json(resp.text), '$.features')::array<variant>) as col
@@ -94,5 +99,8 @@ begin
       col:geometry.coordinates[1]::double as latitude,
       col:geometry.coordinates[2]::double as depth
     from raw_data;
+  else
+    insert into IDENTIFIER(:catalog || '.' || :schema || '.' || 'earthquakes_log')
+      values (current_timestamp(), :job_id, :job_run_id, resp.status_code, resp.text);
   end if;
 end;
