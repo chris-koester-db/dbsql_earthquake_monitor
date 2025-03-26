@@ -14,9 +14,14 @@ resources:
           default: ${var.catalog}
         - name: schema
           default: ${var.schema}
+        - name: api_path
+          default: ${var.api_path}
 
       tasks:
         - task_key: earthquake_monitor
           notebook_task:
             notebook_path: ../src/earthquake_monitor.sql
             warehouse_id: ${var.warehouse_id}
+            base_parameters:
+              job_id: "{{workspace.id}}"
+              job_run_id: "{{job.run_id}}"
