@@ -43,7 +43,7 @@ select
     http_request(
       conn => 'usgs_conn',
       method => 'GET',
-      path => 'summary/all_day.geojson'
+      path => :api_path
     ).text
   ) as resp_variant
 ),

@@ -14,6 +14,9 @@ variables:
     description: The catalog to use
   schema:
     description: The schema to use
+  api_path:
+    description: The API api_path
+    default: 'summary/all_day.geojson'
 
 targets:
   dev:
