@@ -10,14 +10,11 @@ include:
 variables:
   warehouse_id:
     description: The warehouse to use
-    default: 28c45e0105126758
+    default: e00af23ead5f62bd
   catalog:
     description: The catalog to use
   schema:
     description: The schema to use
-  api_path:
-    description: The API api_path
-    default: 'summary/all_day.geojson'
 
 targets:
   dev:
@@ -30,7 +27,7 @@ targets:
     workspace:
       host: https://e2-demo-field-eng.cloud.databricks.com
     variables:
-      warehouse_id: 28c45e0105126758
+      warehouse_id: e00af23ead5f62bd
       catalog: main
       schema: ${workspace.current_user.short_name}
 
@@ -41,7 +38,7 @@ targets:
       # We explicitly specify /Workspace/Users/chris.koester@databricks.com to make sure we only have a single copy.
       root_path: /Workspace/Users/chris.koester@databricks.com/.bundle/${bundle.name}/${bundle.target}
     variables:
-      warehouse_id: 28c45e0105126758
+      warehouse_id: e00af23ead5f62bd
       catalog: main
       schema: default
     permissions:
