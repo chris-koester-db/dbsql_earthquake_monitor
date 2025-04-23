@@ -1,7 +1,7 @@
-# This is a Databricks asset bundle definition for dbsql_earthquake_monitor.
+# This is a Databricks asset bundle definition for nasa_asteroids.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: dbsql_earthquake_monitor
+  name: nasa_asteroids
 
 include:
   - resources/*.yml
@@ -10,6 +10,7 @@ include:
 variables:
   warehouse_id:
     description: The warehouse to use
+    default: 28c45e0105126758
   catalog:
     description: The catalog to use
   schema:
@@ -29,7 +30,7 @@ targets:
     workspace:
       host: https://e2-demo-field-eng.cloud.databricks.com
     variables:
-      warehouse_id: a03e92ecabb214fc
+      warehouse_id: 28c45e0105126758
       catalog: main
       schema: ${workspace.current_user.short_name}
 
@@ -40,7 +41,7 @@ targets:
       # We explicitly specify /Workspace/Users/chris.koester@databricks.com to make sure we only have a single copy.
       root_path: /Workspace/Users/chris.koester@databricks.com/.bundle/${bundle.name}/${bundle.target}
     variables:
-      warehouse_id: a03e92ecabb214fc
+      warehouse_id: 28c45e0105126758
       catalog: main
       schema: default
     permissions:

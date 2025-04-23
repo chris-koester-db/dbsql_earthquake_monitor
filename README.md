@@ -1,3 +1,3 @@
-# DBSQL Earthquake Monitor
+# DBSQL HTTP Applications
 
-Monitor earthquakes using [USGS data feeds](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) and Databricks SQL
+Examples of how to use [http_request](https://docs.databricks.com/aws/en/sql/language-manual/functions/http_request) in Databricks SQL to perform HTTP calls.
