@@ -10,7 +10,7 @@ set var resp = (
         'neo/rest/v1/feed?',
         'start_date=', :date_param,
         '&end_date=', :date_param,
-        '&api_key=', 'XWgMM2Vgo5olo30brpfq5zzKP3Xv0Vecx2sIRiee'
+        '&api_key=', secret('secret_scope', 'secret')
       )
     )
 );
