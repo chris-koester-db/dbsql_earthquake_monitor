@@ -81,7 +81,7 @@ begin
     (select from_json(resp.text, schema_of_json(json_str)).res)
   );
   
-  -- Set token for next page of results. Will be null of not present.
+  -- Set token for next page of results. Will be null if not present.
   set page_token = (select from_json(resp.text, schema_of_json(json_str)).next_page_token);
   
   -- Get remaining pages of results
@@ -102,7 +102,7 @@ begin
       (select from_json(resp.text, schema_of_json(json_str)).res)
     );
 
-    -- Set token for next page of results. Will be null of not present.
+    -- Set token for next page of results. Will be null if not present.
     set page_token = (select from_json(resp.text, schema_of_json(json_str)).next_page_token);
   end while;
   
