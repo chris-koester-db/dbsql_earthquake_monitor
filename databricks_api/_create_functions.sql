@@ -4,6 +4,16 @@ use schema identifier(:schema);
 
 -- COMMAND ----------
 
+-- MAGIC %md
+-- MAGIC # Unity Catalog
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC ## Tables
+
+-- COMMAND ----------
+
 -- DBTITLE 1,Get a Table
 -- https://docs.databricks.com/api/workspace/tables/get
 -- create function if not exists get_table(table_name string)
@@ -25,6 +35,16 @@ from (select
 
 -- COMMAND ----------
 
+-- MAGIC %md
+-- MAGIC # File Management
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC ## Files
+
+-- COMMAND ----------
+
 -- DBTITLE 1,List Directory Contents
 -- https://docs.databricks.com/api/workspace/files/listdirectorycontents
 create or replace function list_directory_contents(directory_path string)
@@ -41,6 +61,44 @@ from (select
      from_json(
        resp,
        'STRUCT<contents: ARRAY<STRUCT<file_size: BIGINT, is_directory: BOOLEAN, last_modified: BIGINT, name: STRING, path: STRING>>>'
+     ) as resp;
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC # Databricks SQL
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC ## SQL Warehouses
+
+-- COMMAND ----------
+
+-- DBTITLE 1,List Warehouses
+-- https://docs.databricks.com/api/workspace/warehouses/list
+create or replace function list_warehouses(
+  run_as_user_id int default null
+)
+comment 'Lists all SQL warehouses that a user has manager permissions on. https://docs.databricks.com/api/workspace/warehouses/list'
+return
+from (select
+  http_request(
+    conn => 'databricks_api',
+    method => 'GET',
+    path => '2.0/sql/warehouses',
+    json => 
+      to_json(
+        named_struct(
+          'run_as_user_id', run_as_user_id
+        )
+      )
+  ).text as resp
+)
+|> select
+     from_json(
+       resp,
+       'STRUCT<warehouses: ARRAY<STRUCT<auto_stop_mins: STRING, channel: STRUCT<dbsql_version: STRING, name: STRING>, cluster_size: STRING, creator_name: STRING, enable_photon: BOOLEAN, enable_serverless_compute: BOOLEAN, health: STRUCT<details: STRING, failure_reason: STRUCT<code: STRING, parameters: STRUCT<property1: STRING, property2: STRING>, type: STRING>, message: STRING, status: STRING, summary: STRING>, id: STRING, instance_profile_arn: STRING, jdbc_url: STRING, max_num_clusters: BIGINT, min_num_clusters: STRING, name: STRING, num_active_sessions: BIGINT, num_clusters: BIGINT, odbc_params: STRUCT<hostname: STRING, path: STRING, port: BIGINT, protocol: STRING>, spot_instance_policy: STRING, state: STRING, tags: STRUCT<custom_tags: ARRAY<STRUCT<key: STRING, value: STRING>>>, warehouse_type: STRING>>>'
      ) as resp;
 
 -- COMMAND ----------
@@ -76,6 +134,49 @@ from (select
        resp,
        'STRUCT<id: STRING>'
      ) as resp;
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Get Warehouse Info
+-- https://docs.databricks.com/api/workspace/warehouses/get
+create or replace function get_warehouse_info(
+  id string
+)
+comment 'Gets the information for a single SQL warehouse. https://docs.databricks.com/api/workspace/warehouses/get'
+return
+from (select
+  http_request(
+    conn => 'databricks_api',
+    method => 'GET',
+    path => concat('2.0/sql/warehouses/', id)
+  ).text as resp
+)
+|> select
+     from_json(
+       resp,
+       'STRUCT<auto_stop_mins: STRING, channel: STRUCT<dbsql_version: STRING, name: STRING>, cluster_size: STRING, creator_name: STRING, enable_photon: BOOLEAN, enable_serverless_compute: BOOLEAN, health: STRUCT<details: STRING, failure_reason: STRUCT<code: STRING, parameters: STRUCT<property1: STRING, property2: STRING>, type: STRING>, message: STRING, status: STRING, summary: STRING>, id: STRING, instance_profile_arn: STRING, jdbc_url: STRING, max_num_clusters: BIGINT, min_num_clusters: STRING, name: STRING, num_active_sessions: BIGINT, num_clusters: BIGINT, odbc_params: STRUCT<hostname: STRING, path: STRING, port: BIGINT, protocol: STRING>, spot_instance_policy: STRING, state: STRING, tags: STRUCT<custom_tags: ARRAY<STRUCT<key: STRING, value: STRING>>>, warehouse_type: STRING>'
+     ) as resp;
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Delete a Warehouse
+-- https://docs.databricks.com/api/workspace/warehouses/delete
+create or replace function delete_warehouse(
+  id string
+)
+comment 'Deletes a SQL warehouse. https://docs.databricks.com/api/workspace/warehouses/delete'
+return
+select
+  http_request(
+    conn => 'databricks_api',
+    method => 'DELETE',
+    path => concat('2.0/sql/warehouses/', id)
+  ).text as resp;
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC ## Query History
 
 -- COMMAND ----------
 
